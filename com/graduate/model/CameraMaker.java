@@ -28,7 +28,8 @@ public class CameraMaker {
                 {focalLength/dX,0,resX/2},
                 {0,focalLength/dY,resY/2},
                 {0,0,1}};
-        return new Camera(intrinsicParameterMatrix,extrinsicParameterMatrix,rotateMatrix,position);
+        return new Camera(intrinsicParameterMatrix,extrinsicParameterMatrix,rotateMatrix,
+                position,focalLength,1.532E-4, -9.656E-8);
     }
 
     public static Camera[] makeCameras(double[][]data){

@@ -56,8 +56,8 @@ public class TheWorld {
             double[][]rayFunction=camera.getDirectionInWorld(pixelCoordinate);
             rayFunctions= MatrixOperator.jointByCol(rayFunctions,rayFunction);
         }
-        MatrixOperator.niceToString(position);
-        MatrixOperator.niceToString(theWorld.rayIntersection(rayFunctions));
-        MatrixOperator.niceToString(rayFunctions);
+        MatrixOperator.nicePrint(position);
+        MatrixOperator.nicePrint(theWorld.rayIntersection(rayFunctions));
+        MatrixOperator.nicePrint(rayFunctions);
     }
 }

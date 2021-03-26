@@ -50,9 +50,41 @@ public class MatrixOperator {
         }
     }
 
-    public static double[] getEigenValue(double[][]matrix){
+    public static double getMaxEigenValueAndVector(double[][]matrix, double[][] vector){
+        if(matrix==null||matrix.length==0||matrix.length!=matrix[0].length||vector==null||matrix.length!=vector.length){
+            System.out.println("bad input");
+            return 0;
+        }
+        int len=matrix.length;
+        for(int i=0;i<len;i++){
+            vector[i][0]=1;
+        }
+        double[][]last=new double[len][1];
+        double lambda=0;
+        while(vectorMaxDif(vector,last)>1E-20){
+            double[][]temp=multiply(matrix,vector);
+            double[][] unit=toUnitVector(temp);
+            lambda=temp[0][0]/unit[0][0];
+            for(int i=0;i<len;i++){
+                last[i][0]=vector[i][0];
+                vector[i][0]=unit[i][0];
+            }
+        }
+        return lambda;
+    }
 
-        return null;
+    public static double vectorMaxDif(double[][]vector1, double[][]vector2){
+        if(vector1==null||vector2==null||vector1.length!=vector2.length){
+            System.out.println("bad input");
+            return 0;
+        }
+        double max=0;
+        int len=vector1.length;
+        for(int i=0;i<len;i++){
+            double dif=Math.abs(vector1[i][0]-vector2[i][0]);
+            max=Math.max(max,dif);
+        }
+        return max;
     }
 
     public static double[][] solveLinearEquation(double[][]matrixA,double[][]vectorb){
@@ -63,28 +95,42 @@ public class MatrixOperator {
             return new double[matrixA.length][1];
         }
         int len=matrixA.length;
+        double[][] matrix=new double[len][len];
+        for(int i=0;i<len;i++)matrix[i]=matrixA[i].clone();
         double[][] x=new double[len][1];
         for(int i=0;i<len;i++){
-            if(matrixA[i][i]==0.0){
+            if(matrix[i][i]==0.0){
                 int j=i+1;
-                while(matrixA[j][i]==0.0)j++;
-                exchangeRow(matrixA,i,j);
+                while(matrix[j][i]==0.0)j++;
+                exchangeRow(matrix,i,j);
                 exchangeRow(vectorb,i,j);
             }
-            rowMultiply(vectorb,i,1/matrixA[i][i]);
-            rowMultiply(matrixA,i,1/matrixA[i][i]);
-            for(int j=i+1;j<matrixA.length;j++){
-                rowJminusrowI(vectorb,i,j,matrixA[j][i]);
-                rowJminusrowI(matrixA,i,j,matrixA[j][i]);
+            rowMultiply(vectorb,i,1/matrix[i][i]);
+            rowMultiply(matrix,i,1/matrix[i][i]);
+            for(int j=i+1;j<matrix.length;j++){
+                rowJminusrowI(vectorb,i,j,matrix[j][i]);
+                rowJminusrowI(matrix,i,j,matrix[j][i]);
             }
         }
         for(int i=len-1;i>=0;i--){
             for(int j=len-1;j>i;j--){
-                vectorb[i][0]-=matrixA[i][j]*x[j][0];
+                vectorb[i][0]-=matrix[i][j]*x[j][0];
             }
-            x[i][0]=vectorb[i][0]/matrixA[i][i];
+            x[i][0]=vectorb[i][0]/matrix[i][i];
         }
         return x;
+    }
+
+    public static double[][] linearRegression(double[][]X, double[][]Y){
+        if(X.length!=Y.length||Y[0].length!=1){
+            System.out.println("bad input");
+            return null;
+        }
+        double[][]XT=transposition(X);
+        double[][]XTX=multiply(XT,X);
+        double[][]XTXreverse=reverse(XTX);
+        double[][]XTY=multiply(XT,Y);
+        return multiply(XTXreverse,XTY);
     }
 
     //the vector b or x should be a column vector
@@ -349,15 +395,22 @@ public class MatrixOperator {
         return true;
     }
 
-    public static void niceToString(double[][]matrix){
+    public static void nicePrint(double[][]matrix){
         if(matrix==null){
             System.out.println(matrix);
-            return;
         }else{
             for(int i=0;i<matrix.length;i++){
                 System.out.println(Arrays.toString(matrix[i]));
             }
         }
+    }
+
+    public static void main(String[] args) {
+        double[][] matrix={{6,5,-5},{2,6,-2},{2,5,-1}};
+        double[][] vector=new double[3][1];
+        System.out.println(getMaxEigenValueAndVector(matrix,vector));
+        nicePrint(vector);
+        nicePrint(multiply(matrix,vector));
     }
 
 }
