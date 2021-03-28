@@ -91,8 +91,8 @@ public class Camera {
         double[][]pixelCoordinate=MatrixOperator.multiply(imageToPixel,imageCoordinate);
         int[][]res=new int[2][n];
         for(int i=0;i<n;i++){
-            res[0][i]=(int)Math.round(pixelCoordinate[0][i]);//new Double(pixelCoordinate[0][i]).intValue();
-            res[1][i]=(int)Math.round(pixelCoordinate[1][i]);//new Double(pixelCoordinate[1][i]).intValue();
+            res[0][i]=/*(int)Math.round(pixelCoordinate[0][i]);*/new Double(pixelCoordinate[0][i]).intValue();
+            res[1][i]=/*(int)Math.round(pixelCoordinate[1][i]);*/new Double(pixelCoordinate[1][i]).intValue();
         }
         return res;
     }

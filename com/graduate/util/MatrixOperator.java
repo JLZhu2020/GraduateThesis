@@ -338,10 +338,18 @@ public class MatrixOperator {
         return sum;
     }
 
+    public static double distance(double[][]point1, double[][]point2){
+        double dist=0.0;
+        for(int i=0;i<point1.length;i++){
+            dist+=(point1[i][0]-point2[i][0])*(point1[i][0]-point2[i][0]);
+        }
+        return Math.sqrt(dist);
+    }
+
     //int put mXn1 and mXn2 matrix, return mX(n1+n2) matrixC, matrixB is on the right of matrixA
     public static double[][] jointByCol(double[][]matrixA,double[][]matrixB){
         if(matrixA==null||matrixB==null||matrixA.length!=matrixB.length){
-            System.out.println("could not joint");
+           // System.out.println("could not joint");
             return matrixA==null?(matrixB==null?null:matrixB):matrixA;
         }
         double[][]matrixC=new double[matrixA.length][matrixA[0].length+matrixB[0].length];
