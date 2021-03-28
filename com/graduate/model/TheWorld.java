@@ -7,6 +7,23 @@ public class TheWorld {
     Camera[]cameras;
     BallTrack ballTrack;
 
+    //do the first method(linear regression way) and polynomial calibration equation
+    public double[][] calibration1P(double[][]distCoordinate, double[][]imageCoordinate){
+        int n=distCoordinate[0].length;
+        double[][]X=new double[2*n][2];
+        double[][]Y=new double[2*n][1];
+        for(int i=0;i<n;i++){
+            X[2*i][0]=1;
+            X[2*i+1][0]=1;
+            double r2=distCoordinate[0][i]*distCoordinate[0][i]+distCoordinate[1][i]*distCoordinate[1][i];
+            X[2*i][1]=r2;
+            X[2*i+1][1]=r2;
+            Y[2*i][0]=(imageCoordinate[0][i]-distCoordinate[0][i])/(distCoordinate[0][i]*r2);
+            Y[2*i+1][0]=(imageCoordinate[1][i]-distCoordinate[1][i])/(distCoordinate[1][i]*r2);
+        }
+        return MatrixOperator.linearRegression(X,Y);
+    }
+
     public double[][] rayIntersection(double[][]rayFunctions){
         int length=rayFunctions.length;
         double[][]augmentationMatrix=new double[6][length];
@@ -49,15 +66,40 @@ public class TheWorld {
         String[] ballFile = FileOperator.readFromDatFile("ball.dat");
         double[][]ballData=FileOperator.dealTheData(ballFile);
         theWorld.ballTrack=new BallTrack(ballData);
-        double[][]position=theWorld.ballTrack.getPosition(0.677);
-        double[][]rayFunctions=null;
-        for(Camera camera:theWorld.cameras){
-            int[][]pixelCoordinate=camera.convertWorldToPixel(position);
-            double[][]rayFunction=camera.getDirectionInWorld(pixelCoordinate);
-            rayFunctions= MatrixOperator.jointByCol(rayFunctions,rayFunction);
+        double[][]court={
+                {0.0,0.0,-4.115,4.115,-4.115,4.115,-4.115,-4.115,4.115,4.115},
+                {6.4,-6.4,6.4,6.4,-6.4,-6.4,11.885,-11.885,11.885,-11.885},
+                {0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01}};
+        double K1P=0;
+        double K2P=0;
+        for(int i=0;i<theWorld.cameras.length;i++){
+            Camera camerai=theWorld.cameras[i];
+            double[][]distCoordinates=camerai.pixelToDist(camerai.convertWorldToPixelWithDistortion(court));
+            double[][]imageCoordinates=camerai.worldToImage(court);
+            double[][]KP=theWorld.calibration1P(distCoordinates,imageCoordinates);
+            MatrixOperator.nicePrint(KP);
+            MatrixOperator.nicePrint(imageCoordinates);
+            MatrixOperator.nicePrint(distCoordinates);
+            System.out.println("==============================================================");
+            K1P+=KP[0][0];
+            K2P+=KP[1][0];
         }
-        MatrixOperator.nicePrint(position);
-        MatrixOperator.nicePrint(theWorld.rayIntersection(rayFunctions));
-        MatrixOperator.nicePrint(rayFunctions);
+        K1P/=theWorld.cameras.length;
+        K2P/=theWorld.cameras.length;
+        System.out.println(K1P+" "+K2P);
+        for(Camera camera:theWorld.cameras)camera.setK1PandK2P(K1P,K2P);
+//        double[][]position=theWorld.ballTrack.getPosition(0.677);
+//        double[][]rayFunctions=null;
+//        for(Camera camera:theWorld.cameras){
+//            int[][]pixelCoordinate=camera.convertWorldToPixel(position);
+//            double[][]rayFunction=camera.getDirectionInWorldP(pixelCoordinate);
+//            rayFunctions= MatrixOperator.jointByCol(rayFunctions,rayFunction);
+//        }
+//        MatrixOperator.nicePrint(position);
+//        MatrixOperator.nicePrint(theWorld.rayIntersection(rayFunctions));
+//        MatrixOperator.nicePrint(rayFunctions);
     }
+
+
+
 }

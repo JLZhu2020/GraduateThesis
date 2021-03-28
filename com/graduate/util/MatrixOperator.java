@@ -250,25 +250,27 @@ public class MatrixOperator {
             return null;
         }
         int len=matrix.length;
+        double[][]temp=new double[len][len];
+        for(int i=0;i<len;i++)temp[i]=matrix[i].clone();
         double[][] matrixI=matrixI(len);
         for(int i=0;i<len;i++){
-            if(matrix[i][i]==0.0){
+            if(temp[i][i]==0.0){
                 int j=i+1;
-                while(matrix[j][i]==0.0)j++;
-                exchangeRow(matrix,i,j);
+                while(temp[j][i]==0.0)j++;
+                exchangeRow(temp,i,j);
                 exchangeRow(matrixI,i,j);
             }
-            rowMultiply(matrixI,i,1/matrix[i][i]);
-            rowMultiply(matrix,i,1/matrix[i][i]);
+            rowMultiply(matrixI,i,1/temp[i][i]);
+            rowMultiply(temp,i,1/temp[i][i]);
             for(int j=i+1;j<len;j++){
-                rowJminusrowI(matrixI,i,j,matrix[j][i]);
-                rowJminusrowI(matrix,i,j,matrix[j][i]);
+                rowJminusrowI(matrixI,i,j,temp[j][i]);
+                rowJminusrowI(temp,i,j,temp[j][i]);
             }
         }
         for(int i=len-1;i>=0;i--){
             for(int j=i-1;j>=0;j--){
-                rowJminusrowI(matrixI,i,j,matrix[j][i]);
-                rowJminusrowI(matrix,i,j,matrix[j][i]);
+                rowJminusrowI(matrixI,i,j,temp[j][i]);
+                rowJminusrowI(temp,i,j,temp[j][i]);
             }
         }
         return matrixI;
@@ -407,10 +409,10 @@ public class MatrixOperator {
 
     public static void main(String[] args) {
         double[][] matrix={{6,5,-5},{2,6,-2},{2,5,-1}};
-        double[][] vector=new double[3][1];
-        System.out.println(getMaxEigenValueAndVector(matrix,vector));
-        nicePrint(vector);
-        nicePrint(multiply(matrix,vector));
+        nicePrint(MatrixOperator.reverse(matrix));
+        nicePrint(matrix);
+        nicePrint(MatrixOperator.multiply(matrix,MatrixOperator.reverse(matrix)));
+        nicePrint(MatrixOperator.multiply(MatrixOperator.reverse(matrix),matrix));
     }
 
 }
