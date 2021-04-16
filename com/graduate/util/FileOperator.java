@@ -1,8 +1,6 @@
 package com.graduate.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +58,22 @@ public class FileOperator {
             }
         }
         return res;
+    }
+
+    public static File makeFile(String fileName, String[] data){
+        try{
+            File file=new File(fileName);
+            FileWriter fileWriter=new FileWriter(fileName);
+            BufferedWriter bufferedWriter=new BufferedWriter(fileWriter);
+            for(int i=0;i<data.length;i++){
+                bufferedWriter.write(data[i]);
+            }
+            bufferedWriter.close();
+            return file;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

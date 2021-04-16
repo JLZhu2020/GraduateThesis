@@ -29,7 +29,7 @@ public class CameraMaker {
                 {0,focalLength/dY,resY/2},
                 {0,0,1}};
         return new Camera(intrinsicParameterMatrix,extrinsicParameterMatrix,rotateMatrix,
-                position,focalLength,1.532E-1, -9.656E-8);
+                position,focalLength,-1.28E-4, 1.61E-6);
     }
 
     public static Camera[] makeCameras(double[][]data){
@@ -50,23 +50,15 @@ public class CameraMaker {
         }
         heading=heading*Math.PI/180;
         elevation=elevation*Math.PI/180;
-        double[][]matrixH={
-                {1,0,0},
-                {0,Math.cos(heading),Math.sin(heading)},
-                {0,-Math.sin(heading),Math.cos(heading)}};
-        double[][]matrixE={
-                {Math.cos(elevation),Math.sin(elevation),0},
-                {-Math.sin(elevation),Math.cos(elevation),0},
-                {0,0,1}};
-        double[][]res= MatrixOperator.multiply(matrixE,matrixH);
-        if(another.length==1){
-            double[][]matrixA={
-                    {Math.cos(another[0]),0,Math.sin(another[0])},
-                    {0,1,0},
-                    {-Math.sin(another[0]),0,Math.cos(another[0])}};
-            res=MatrixOperator.multiply(matrixA,res);
-        }
-        return res;
+        double cosHeading   = Math.cos(heading);
+        double sinHeading   = Math.sin(heading);
+        double cosElevation = Math.cos(elevation);
+        double sinElevation = Math.sin(elevation);
+        double[][]rotateMatrix={
+                {-cosHeading,sinHeading,0.0},
+                {-sinHeading * sinElevation, -cosHeading * sinElevation, cosElevation},
+                {sinHeading * cosElevation, cosHeading * cosElevation, sinElevation}};
+        return rotateMatrix;
     }
 
 
